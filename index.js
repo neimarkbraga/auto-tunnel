@@ -37,7 +37,7 @@ const startTunnel = () => {
       });
 
       console.log('executing pre-start scripts.');
-      stream.write(`ps -aux | grep ssh | grep hass-tunneller | grep @pts | grep -v \`ps --no-headers -eo ppid -fp $$\` | awk "{print \\$2}" | xargs -r kill\n`);
+      stream.write(`ps -aux | grep ssh | grep ${config.username} | grep @pts | grep -v \`ps --no-headers -eo ppid -fp $$\` | awk "{print \\$2}" | xargs -r kill\n`);
       stream.end('exit\n');
     });
   });
