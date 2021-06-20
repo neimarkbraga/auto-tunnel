@@ -22,15 +22,22 @@ const startTunnel = () => {
   const client = new Client();
 
   client.on('ready', () => {
+    console.log('client is ready.');
+
     client.shell((err, stream) => {
       if (err) throw err;
+
+      stream.on('data', () => {/* close event does not trigger if data event is not handled */});
       stream.on('close', () => {
+        console.log('pre-start scripts done.');
         client.forwardIn(config.remoteHost, config.remotePort, (err) => {
           if (err) throw err;
           else console.log(`listening to remote: ${config.remoteHost}:${config.remotePort}`);
         });
       });
-      stream.write(`ps -aux | grep ssh | grep hass-tunneller | grep @pts | grep -v \`ps --no-headers -eo ppid -fp $$\` | awk "{print \\$2}" | xargs kill\n`);
+
+      console.log('executing pre-start scripts.');
+      stream.write(`ps -aux | grep ssh | grep hass-tunneller | grep @pts | grep -v \`ps --no-headers -eo ppid -fp $$\` | awk "{print \\$2}" | xargs -r kill\n`);
       stream.end('exit\n');
     });
   });
