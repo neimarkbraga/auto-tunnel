@@ -22,9 +22,16 @@ const startTunnel = () => {
   const client = new Client();
 
   client.on('ready', () => {
-    client.forwardIn(config.remoteHost, config.remotePort, (err) => {
+    client.shell((err, stream) => {
       if (err) throw err;
-      else console.log(`listening to remote: ${config.remoteHost}:${config.remotePort}`);
+      stream.on('close', () => {
+        client.forwardIn(config.remoteHost, config.remotePort, (err) => {
+          if (err) throw err;
+          else console.log(`listening to remote: ${config.remoteHost}:${config.remotePort}`);
+        });
+      });
+      stream.write(`ps -aux | grep ssh | grep hass-tunneller | grep @pts | grep -v \`ps --no-headers -eo ppid -fp $$\` | awk "{print \\$2}" | xargs kill\n`);
+      stream.end('exit\n');
     });
   });
 
