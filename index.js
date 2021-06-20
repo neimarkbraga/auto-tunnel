@@ -27,6 +27,9 @@ const startTunnel = () => {
     client.shell((err, stream) => {
       if (err) throw err;
 
+      // stream.on('data', data => console.log(data.toString().trim()));
+      // stream.write(`lsof -i\n`);
+
       stream.on('data', () => {/* close event does not trigger if data event is not handled */});
       stream.on('close', () => {
         console.log('pre-start scripts done.');
@@ -37,7 +40,7 @@ const startTunnel = () => {
       });
 
       console.log('executing pre-start scripts.');
-      stream.write(`ps -aux | grep ssh | grep ${config.username} | grep @pts | grep -v \`ps --no-headers -eo ppid -fp $$\` | awk "{print \\$2}" | xargs -r kill\n`);
+      stream.write(`lsof -u ${config.username} | grep sshd | grep -v \`ps --no-headers -eo ppid -fp $$\` | awk "{print \\$2}" | xargs -r kill\n`);
       stream.end('exit\n');
     });
   });
