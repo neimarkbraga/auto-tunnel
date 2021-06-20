@@ -1,0 +1,9 @@
+.idea
+.idea/*
+
+node_modules
+node_modules/*
+
+.env
+
+id_rsa
